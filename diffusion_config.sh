@@ -4,7 +4,7 @@
 INST_NAME="Nano Installer Script";
 AUTH_NAME="osm0sis @ xda-developers";
 
-USE_ARCH=false
+USE_ARCH=true
 USE_ZIP_OPTS=true
 
 custom_setup() {
@@ -24,15 +24,56 @@ custom_target() {
 
 custom_install() {
   ui_print " ";
-  set_perm 0 0 755 $BIN/nano $BIN/nano.bin-arm $BIN/nano.bin-arm64;
-  if $BIN/nano.bin-arm64 --version >/dev/null 2>&1; then
-    ui_print "Installing nano (arm64) to $BIN ...";
-    mv -f $BIN/nano.bin-arm64 $BIN/nano.bin;
-  else
-    ui_print "Installing nano (arm) to $BIN ...";
-    mv -f $BIN/nano.bin-arm $BIN/nano.bin;
-  fi;
-  rm -f $BIN/nano.bin-arm*;
+  set_perm 0 0 755 $BIN/nano $BIN/nano.bin-arm $BIN/nano.bin-arm64 $BIN/nano.bin-x86_64;
+  
+  case $ARCH in
+    arm64)
+      if [ -f $BIN/nano.bin-arm64 ] && $BIN/nano.bin-arm64 --version >/dev/null 2>&1; then
+        ui_print "Installing nano (arm64) to $BIN ...";
+        mv -f $BIN/nano.bin-arm64 $BIN/nano.bin;
+        rm -f $BIN/nano.bin-arm $BIN/nano.bin-x86_64;
+      else
+        ui_print "Failed to verify arm64 binary!";
+        abort;
+      fi;
+      ;;
+    arm)
+      if [ -f $BIN/nano.bin-arm ] && $BIN/nano.bin-arm --version >/dev/null 2>&1; then
+        ui_print "Installing nano (arm) to $BIN ...";
+        mv -f $BIN/nano.bin-arm $BIN/nano.bin;
+        rm -f $BIN/nano.bin-arm64 $BIN/nano.bin-x86_64;
+      else
+        ui_print "Failed to verify arm binary!";
+        abort;
+      fi;
+      ;;
+    x86_64)
+      if [ -f $BIN/nano.bin-x86_64 ] && $BIN/nano.bin-x86_64 --version >/dev/null 2>&1; then
+        ui_print "Installing nano (x86_64) to $BIN ...";
+        mv -f $BIN/nano.bin-x86_64 $BIN/nano.bin;
+        rm -f $BIN/nano.bin-arm $BIN/nano.bin-arm64;
+      else
+        ui_print "Failed to verify x86_64 binary!";
+        abort;
+      fi;
+      ;;
+    x86)
+      # x86 devices can fall back to arm binary as a compatibility measure
+      if [ -f $BIN/nano.bin-arm ] && $BIN/nano.bin-arm --version >/dev/null 2>&1; then
+        ui_print "Installing nano (arm - compatibility fallback for x86) to $BIN ...";
+        mv -f $BIN/nano.bin-arm $BIN/nano.bin;
+        rm -f $BIN/nano.bin-arm64 $BIN/nano.bin-x86_64;
+      else
+        ui_print "Failed to verify arm binary for x86 fallback!";
+        abort;
+      fi;
+      ;;
+    *)
+      ui_print "Unsupported architecture: $ARCH";
+      abort;
+      ;;
+  esac;
+  
   ui_print "Installing terminfo to $ETC ...";
   if ! $BOOTMODE; then
     ui_print "Installing nano recovery script to /sbin ...";
@@ -67,5 +108,3 @@ custom_exitmsg() {
 }
 
 # additional custom functions
-
-
