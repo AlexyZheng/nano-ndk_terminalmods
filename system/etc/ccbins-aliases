@@ -16,6 +16,14 @@ alias sbash='. /system/etc/bash/bashrc'
 alias sudo='su -c "$@"'
 alias vd='cd'
 
+# --- Android pm wrappers mirroring apt/dpkg ---
+alias dpkg='pm'
+alias apt='pm'
+alias install='pm install'
+alias purge='pm clear'
+alias remove='pm uninstall'
+alias path='pm path'
+alias list='pm list packages'
 
 #custom
 alias hm='cd /sdcard'
@@ -116,7 +124,7 @@ alias ifup='sudo busybox ifup'
 alias inetd='sudo busybox inetd'
 alias inotifyd='sudo busybox inotifyd'
 alias insmod='sudo busybox insmod'
-alias install='sudo busybox install'
+#alias install='sudo busybox install'
 alias ionice='sudo busybox ionice'
 alias ipaddr='sudo busybox ipaddr'
 alias ipcalc='sudo busybox ipcalc'
