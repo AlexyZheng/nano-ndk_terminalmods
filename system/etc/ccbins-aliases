@@ -20,7 +20,7 @@ alias vd='cd'
 #custom
 alias hm='cd /sdcard'
 alias dl='cd /sdcard/Download'
-alias nano='sudo nano -A -D -F -G -G -I -L -M -P -S -U -Z -a -l -q -_ -/'
+alias nano='su -c "/system/bin/nano.bin -A -D -F -G -G -I -L -M -S -U -Z -a -l -q -_ -/"'
 
 
 
