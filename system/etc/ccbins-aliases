@@ -26,8 +26,8 @@ alias path='pm path'
 alias list='pm list packages'
 
 #custom
-alias hm='cd /sdcard'
-alias dl='cd /sdcard/Download'
+alias home='cd /sdcard'
+alias download='cd /sdcard/Download'
 alias nano='sudo /system/bin/nano -A -D -F -G -G -I -L -M -S -U -Z -a -l -q -_ -/'
 
 
