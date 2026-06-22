@@ -29,9 +29,20 @@ alias list='pm list packages'
 alias sdcard='cd /sdcard'
 alias home='cd /sdcard'
 alias download='cd /sdcard/Download'
-alias nano='sudo /system/bin/nano -A -D -F -G -G -I -L -M -S -U -Z -a -l -q -_ -/'
 
+# Define the standard nano function
+nano() {
+    sudo nano -A -D -F -G -I -L -M -S -U -Z -a -q '-_' '-/' "$@"
+}
 
+# Define the nano -l alias/function
+# Note: In POSIX-style shells, functions cannot contain spaces in their names.
+# It is standard practice to use an alias or a distinct function name.
+alias 'nano -l'='nano_l'
+
+nano_l() {
+    sudo nano -A -D -F -G -I -L -M -S -U -Z -a -l -q -l '-_' '-/' "$@"
+}
 
 # Functions which I'm gonna count as aliases
 getperms(){ rootcheck && $ROOT pm get-privapp-permissions $1 | sed "s/, /\n/g" 
