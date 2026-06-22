@@ -76,9 +76,24 @@ alias la='l -A'
 alias ll='l -l'
 alias lo='l -al'
 alias ls='ls --color=auto'
-alias killpac='rootcheck && $ROOT kill $(pidof $1)'
-alias sbash='. /system/etc/bash/bashrc'
-alias sudo='su -c "$@"'
+alias aflinger='dumpsys media.audio_flinger'                                                                           
+alias dservice='dumpsys media.dolby_memoryservice'                                                                     
+alias killice='killall dk.icepower.icesound'                                                                           
+alias l='bb ls --group-directories-first'                                                                              
+alias la='l -A'                                                                                                        
+alias ll='l -l'                                                                                                        
+alias lo='l -al'                                                                                                       
+alias ls='ls --color=auto'                                                                                             
+                                                                                                                       
+# A cleaner, more robust version of your alias                                                                         
+killpac() {                                                                                                            
+    if [ -z "$1" ]; then                                                                                               
+        echo "Usage: killpac <process_name>"                                                                           
+    else                                                                                                               
+        # pkill handles the PID lookup and killing in one step                                                         
+        pkill -f "$1"                                                                                                  
+    fi                                                                                                                 
+}   
 alias vd='cd'
 
 # --- Android pm wrappers mirroring apt/dpkg ---
@@ -113,7 +128,12 @@ nano() {
 
 
 # Functions which I'm gonna count as aliases
-getperms(){ rootcheck && $ROOT pm get-privapp-permissions $1 | sed "s/, /\n/g" 
+getperms() {
+    [ -z "$1" ] && { echo "Usage: getperms <package_name>"; return 1; }
+    pm get-privapp-permissions "$1" | sed 's/, /\n/g'
 }
-getdenyperms(){ rootcheck && $ROOT pm get-privapp-deny-permissions $1 | sed "s/, /\n/g" 
+
+getdenyperms() {
+    [ -z "$1" ] && { echo "Usage: getdenyperms <package_name>"; return 1; }
+    pm get-privapp-deny-permissions "$1" | sed 's/, /\n/g'
 }
