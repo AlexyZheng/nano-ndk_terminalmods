@@ -29,6 +29,7 @@ alias list='pm list packages'
 alias sdcard='cd /sdcard'
 alias home='cd /sdcard'
 alias download='cd /sdcard/Download'
+alias modules='cd /data/adb/modules'
 
 # Define the standard nano function
 nano() {
