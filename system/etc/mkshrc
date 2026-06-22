@@ -1,40 +1,121 @@
-# Copyright (c) 2010
-#	Thorsten Glaser <t.glaser@tarent.de>
-# This file is provided under the same terms as mksh.
-#-
-# Minimal /system/etc/mkshrc for Android
-
 : ${TERM:=xterm-256color} ${HOME:=/} ${MKSH:=/system/bin/sh} ${HOSTNAME:=android}
-: ${SHELL:=$MKSH} ${USER:=$(getprop ro.product.device)}
-if (( USER_ID )); then PS1='$'; else PS1='#'; fi
+: ${SHELL:=$MKSH}
 
-PS1='$HOSTNAME@$USER:${PWD:-?} '"$PS1 "
 export TERM HOME MKSH HOSTNAME SHELL USER PATH
 export TERMINFO=/system/usr/share/terminfo
-
-for p in ~/.bin; do
-	[[ -d $p/. ]] || continue
-	[[ :$PATH: = *:$p:* ]] || PATH=$p:$PATH
-done
-
-unset p
-
-rootcheck(){
-  ROOT= && [ $USER = root ] || ROOT="su -c"
-}
-
 # Load aliases
-. "/system/etc/ccbins-aliases"
-if [ "$USER" = "root" ] && [ -t 0 ] && [ "$ENV_CLEANSED" != "1" ]; then
+#. "/system/etc/ccbins-aliases"
+
+if (( USER_ID == 0 )); then
+    PS1='$HOSTNAME@$USER:${PWD:-?} # '
+else
+    PS1='$HOSTNAME@$USER:${PWD:-?} $ '
+fi
+
+############################################################
+
+IS_INTERACTIVE_SHELL=0
+if [ -t 0 ]; then
+    IS_INTERACTIVE_SHELL=1
+fi
+
+if (( IS_INTERACTIVE_SHELL )) && [ "$ENV_CLEANSED" != "1" ]; then
     export ENV_CLEANSED=1
-    
-    # Determine the target root command path
-    if which su >/dev/null 2>&1; then
-        SU_CMD="$(which su)"
+
+    if [ -x /data/adb/ksu/bin/su ]; then
+        SU_CMD="/data/adb/ksu/bin/su"
+    elif [ -x /data/adb/ap/bin/su ]; then
+        SU_CMD="/data/adb/ap/bin/su"
+    elif command -v su >/dev/null 2>&1; then
+        SU_CMD="$(command -v su)"
+    elif [ -x /system/bin/su ]; then
+        SU_CMD="/system/bin/su"
+    elif [ -x /system/xbin/su ]; then
+        SU_CMD="/system/xbin/su"
     else
         SU_CMD="su"
     fi
 
-    # Open the clean root shell
-    exec env -i PATH=/system/bin:/system/xbin:/product/bin LD_PRELOAD="" ENV_CLEANSED=1 "$SU_CMD"
+    cd /sdcard 2>/dev/null || cd /storage/emulated/0 2>/dev/null || cd /data/local/tmp 2>/dev/null
+
+    exec env -i \
+        PATH=/system/bin:/system/xbin:/product/bin:/apex/com.android.runtime/bin:/data/adb/ksu/bin:/data/adb/ap/bin \
+        TERM="${TERM:-xterm-256color}" \
+        HOME=/data \
+        SHELL=/system/bin/sh \
+        USER=root \
+        ENV_CLEANSED=1 \
+        LD_PRELOAD="" \
+        "$SU_CMD" -m
 fi
+
+##################################################################################################################################################################################
+
+# 1. BUSYBOX universal wrapper function
+_bb_cmd() {
+    # ${0##*/} extracts the command name from the alias
+    busybox "${0##*/}" "$@"
+}
+
+# 2. Define the list of tools
+BB_TOOLS="vi less tree diff patch tar find xargs awk grep nc traceroute wget acpid adjtimex arping ascii bbconfig beep blkdiscard brctl bunzip2 bzcat bzip2 cal chat chattr chcon chrt chvt conspy cpio crond crontab cttyhack dc deallocvt depmod devmem dhcprelay dnsd dnsdomainname dos2unix dumpkmap dumpleases ed eject ether-wake expand factor fakeidentd fallocate fatattr fbset fbsplash fdflush fdformat fgconsole findfs flash_eraseall flash_lock flash_unlock flock freeramdisk fsck.minix fsfreeze fstrim ftpd hd hexedit hush hwclock ifdown ifenslave ifplugd ifup inetd inotifyd insmod ionice ipaddr ipcalc ipcrm ipcs iplink ipneigh iproute iprule iptunnel kbd_mode killall5 link loadfont loadkmap logread lsattr lspci lsscsi lzcat lzma lzop lzopcat makedevs makemime mesg microcom mim mkfifo mknod modinfo mpstat nameif nanddump nandwrite nbd-client nmeter nohup nologin nsenter nuke openvt partprobe pgrep pipe_progress pkill pmap popmaildir powertop pscan pstree pwdx raidautorun rdate rdev readprofile reformime renice resize resume rev rfkill rmmod rtcwake run-init run-parts runcon rx script scriptreplay seedrng selinuxenabled seq sestatus setconsole setenforce setfattr setfont setkeycodes setlogcons setpriv setserial setsid setuidgid shred shuf slattach smemcap ssl_client start-stop-daemon svc svok tac tcpsvd telnet telnetd tftp tftpd ts tsort ttysize tunctl ubiattach ubidetach ubimkvol ubirename ubirmvol ubirsvol ubiupdatevol udhcpc6 udhcpd udpsvd uevent uncompress unexpand unix2dos unlzma unlzop unshare unxz usleep uudecode uuencode vconfig volname watchdog whois xxd xz xzcat zcat zcip"
+
+# 3. Create the aliases dynamically
+for cmd in $BB_TOOLS; do
+    alias "$cmd=_bb_cmd"
+done
+#############################################################
+# .aliases by Skittles9823 2018 - 2019
+#           Terminal Mods
+
+alias aflinger='rootcheck && $ROOT dumpsys media.audio_flinger'
+alias bb='$BBDIR/busybox'
+alias bsu='su -s bash'
+alias dservice='rootcheck && $ROOT dumpsys media.dolby_memoryservice'
+alias killice='rootcheck && $ROOT killall dk.icepower.icesound'
+alias l='bb ls --group-directories-first'
+alias la='l -A'
+alias ll='l -l'
+alias lo='l -al'
+alias ls='ls --color=auto'
+alias killpac='rootcheck && $ROOT kill $(pidof $1)'
+alias sbash='. /system/etc/bash/bashrc'
+alias sudo='su -c "$@"'
+alias vd='cd'
+
+# --- Android pm wrappers mirroring apt/dpkg ---
+alias dpkg='pm'
+alias apt='pm'
+alias install='pm install'
+alias purge='pm clear'
+alias remove='pm uninstall'
+alias path='pm path'
+alias list='pm list packages'
+
+#custom
+alias home='cd /sdcard'
+alias download='cd /sdcard/Download'
+alias modules='cd /data/adb/modules'
+
+
+
+
+config-sh() {
+    su -c "nano -A -D -F -G -I -L -M -S -U -Z -a -q '-_' '-/' /data/adb/modules/nano-ndk/system/etc/mkshrc"
+    sh -n /data/adb/modules/nano-ndk/system/etc/ccbins-aliases && . "/data/adb/modules/nano-ndk/system/etc/mkshrc"
+}
+
+
+
+# Define the standard nano function
+nano() {
+    su -c "nano -A -D -F -G -I -L -M -S -U -Z -a -q '-_' '-/'"
+}
+
+
+
+# Functions which I'm gonna count as aliases
+getperms(){ rootcheck && $ROOT pm get-privapp-permissions $1 | sed "s/, /\n/g" 
+}
+getdenyperms(){ rootcheck && $ROOT pm get-privapp-deny-permissions $1 | sed "s/, /\n/g" 
+}
