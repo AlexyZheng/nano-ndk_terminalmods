@@ -75,16 +75,9 @@ alias l='bb ls --group-directories-first'
 alias la='l -A'
 alias ll='l -l'
 alias lo='l -al'
-alias ls='ls --color=auto'
-alias aflinger='dumpsys media.audio_flinger'                                                                           
-alias dservice='dumpsys media.dolby_memoryservice'                                                                     
-alias killice='killall dk.icepower.icesound'                                                                           
-alias l='bb ls --group-directories-first'                                                                              
-alias la='l -A'                                                                                                        
-alias ll='l -l'                                                                                                        
-alias lo='l -al'                                                                                                       
-alias ls='ls --color=auto'                                                                                             
-                                                                                                                       
+alias ls='ls --color=auto'                                                                               
+alias vd='cd'
+
 # A cleaner, more robust version of your alias                                                                         
 killpac() {                                                                                                            
     if [ -z "$1" ]; then                                                                                               
@@ -94,7 +87,7 @@ killpac() {
         pkill -f "$1"                                                                                                  
     fi                                                                                                                 
 }   
-alias vd='cd'
+
 
 # --- Android pm wrappers mirroring apt/dpkg ---
 alias dpkg='pm'
