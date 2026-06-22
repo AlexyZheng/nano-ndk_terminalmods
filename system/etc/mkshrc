@@ -25,3 +25,16 @@ rootcheck(){
 
 # Load aliases
 . "/system/etc/ccbins-aliases"
+if [ "$USER" = "root" ] && [ -t 0 ] && [ "$ENV_CLEANSED" != "1" ]; then
+    export ENV_CLEANSED=1
+    
+    # Determine the target root command path
+    if which su >/dev/null 2>&1; then
+        SU_CMD="$(which su)"
+    else
+        SU_CMD="su"
+    fi
+
+    # Open the clean root shell and execute a silenced 'cd /sdcard' pivot before starting the interactive terminal
+    exec env -i PATH=/system/bin:/system/xbin:/product/bin LD_PRELOAD="" ENV_CLEANSED=1 "$SU_CMD"
+fi
