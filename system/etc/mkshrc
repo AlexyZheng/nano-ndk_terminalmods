@@ -35,6 +35,6 @@ if [ "$USER" = "root" ] && [ -t 0 ] && [ "$ENV_CLEANSED" != "1" ]; then
         SU_CMD="su"
     fi
 
-    # Open the clean root shell and execute a silenced 'cd /sdcard' pivot before starting the interactive terminal
+    # Open the clean root shell
     exec env -i PATH=/system/bin:/system/xbin:/product/bin LD_PRELOAD="" ENV_CLEANSED=1 "$SU_CMD"
 fi
