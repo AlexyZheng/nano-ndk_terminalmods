@@ -66,28 +66,27 @@ done
 # .aliases by Skittles9823 2018 - 2019
 #           Terminal Mods
 
-alias aflinger='rootcheck && $ROOT dumpsys media.audio_flinger'
-alias bb='$BBDIR/busybox'
-alias bsu='su -s bash'
-alias dservice='rootcheck && $ROOT dumpsys media.dolby_memoryservice'
-alias killice='rootcheck && $ROOT killall dk.icepower.icesound'
-alias l='bb ls --group-directories-first'
-alias la='l -A'
-alias ll='l -l'
-alias lo='l -al'
-alias ls='ls --color=auto'                                                                               
-alias vd='cd'
-
-# A cleaner, more robust version of your alias                                                                         
-killpac() {                                                                                                            
-    if [ -z "$1" ]; then                                                                                               
-        echo "Usage: killpac <process_name>"                                                                           
-    else                                                                                                               
-        # pkill handles the PID lookup and killing in one step                                                         
-        pkill -f "$1"                                                                                                  
-    fi                                                                                                                 
-}   
-
+alias aflinger='dumpsys media.audio_flinger'                                                                                     
+alias dservice='dumpsys media.dolby_memoryservice'                                                                               
+alias killice='killall dk.icepower.icesound'                                                                                     
+alias l='bb ls --group-directories-first'                                                                                        
+alias la='l -A'                                                                                                                  
+alias ll='l -l'                                                                                                                  
+alias lo='l -al'                                                                                                                 
+alias ls='ls --color=auto'                                                                                                       
+alias vd='cd'                                                                                                                    
+                                                                                                                                 
+                                                                                                                                 
+# A cleaner, more robust version of your alias                                                                                   
+killpac() {                                                                                                                      
+    if [ -z "$1" ]; then                                                                                                         
+        echo "Usage: killpac <process_name>"                                                                                     
+    else                                                                                                                         
+        # pkill handles the PID lookup and killing in one step                                                                   
+        pkill -f "$1"                                                                                                            
+    fi                                                                                                                           
+}                                                                                                                                
+     
 
 # --- Android pm wrappers mirroring apt/dpkg ---
 alias dpkg='pm'
