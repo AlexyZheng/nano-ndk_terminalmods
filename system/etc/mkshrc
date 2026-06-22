@@ -3,8 +3,6 @@
 
 export TERM HOME MKSH HOSTNAME SHELL USER PATH
 export TERMINFO=/system/usr/share/terminfo
-# Load aliases
-#. "/system/etc/ccbins-aliases"
 
 if (( USER_ID == 0 )); then
     PS1='$HOSTNAME@$USER:${PWD:-?} # '
