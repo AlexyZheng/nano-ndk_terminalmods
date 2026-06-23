@@ -1,7 +1,8 @@
 : ${TERM:=xterm-256color} ${HOME:=/} ${MKSH:=/system/bin/sh} ${HOSTNAME:=android}
 : ${SHELL:=$MKSH}
 
-export TERM HOME MKSH HOSTNAME SHELL USER PATH
+export TERM HOME MKSH SHELL USER PATH
+export HOSTNAME=$(getprop ro.product.device)
 export TERMINFO=/system/usr/share/terminfo
 
 if (( USER_ID == 0 )); then
@@ -9,6 +10,7 @@ if (( USER_ID == 0 )); then
 else
     PS1='$HOSTNAME@$USER:${PWD:-?} $ '
 fi
+
 
 ############################################################
 
