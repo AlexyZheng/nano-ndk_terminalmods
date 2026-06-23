@@ -11,6 +11,9 @@ else
     PS1='$HOSTNAME@$USER:${PWD:-?} $ '
 fi
 
+if (( IS_INTERACTIVE_SHELL )) && [ "$USER" = "root" ]; then
+    echo "Kernel: $(uname -r) | Android: $(getprop ro.build.version.release) (SDK $(getprop ro.build.version.sdk))"
+fi
 
 ############################################################
 
